@@ -136,32 +136,36 @@ def vertical_gaussian(data, n):
         ret[i, :] = np.sum(np.multiply(padded_data[padding + i - (radius - 1):padding + i + radius, :], kernel),axis = 0)
     return ret
 
-def add_chromatic(im, blurfactor = 1):
+def add_chromatic(im, strength = 1, no_blur = False ):
     r, g, b = im.split()
     rdata = np.asarray(r)
     gdata = np.asarray(g)
     bdata = np.asarray(b)
-        
-    rpolar = cartesian_to_polar(rdata)
-    gpolar = cartesian_to_polar(gdata)
-    bpolar = cartesian_to_polar(bdata)
+    if no_blur:
+        rfinal = r
+        gfinal = g
+        bfinal = b
+    else:
+        rpolar = cartesian_to_polar(rdata)
+        gpolar = cartesian_to_polar(gdata)
+        bpolar = cartesian_to_polar(bdata)
 
-    bluramount = (im.size[0] + im.size[1] - 2) / 100 * blurfactor
-    if round(bluramount) > 0:
-        rpolar = vertical_gaussian(rpolar,round(bluramount))
-        gpolar = vertical_gaussian(gpolar,round(bluramount*1.2))
-        bpolar = vertical_gaussian(bpolar,round(bluramount*1.4))
+        bluramount = (im.size[0] + im.size[1] - 2) / 100 * strength
+        if round(bluramount) > 0:
+            rpolar = vertical_gaussian(rpolar,round(bluramount))
+            gpolar = vertical_gaussian(gpolar,round(bluramount*1.2))
+            bpolar = vertical_gaussian(bpolar,round(bluramount*1.4))
 
-    rcartes = polar_to_cartesian(rpolar, width = rdata.shape[1], height = rdata.shape[0])
-    gcartes = polar_to_cartesian(gpolar, width = gdata.shape[1], height = gdata.shape[0])
-    bcartes = polar_to_cartesian(bpolar, width = bdata.shape[1], height = bdata.shape[0])
+        rcartes = polar_to_cartesian(rpolar, width = rdata.shape[1], height = rdata.shape[0])
+        gcartes = polar_to_cartesian(gpolar, width = gdata.shape[1], height = gdata.shape[0])
+        bcartes = polar_to_cartesian(bpolar, width = bdata.shape[1], height = bdata.shape[0])
 
-    rfinal = Image.fromarray(np.uint8(rcartes) , 'L')
-    gfinal = Image.fromarray(np.uint8(gcartes) , 'L')
-    bfinal = Image.fromarray(np.uint8(bcartes) , 'L')
+        rfinal = Image.fromarray(np.uint8(rcartes) , 'L')
+        gfinal = Image.fromarray(np.uint8(gcartes) , 'L')
+        bfinal = Image.fromarray(np.uint8(bcartes) , 'L')
 
-    gfinal = gfinal.resize((round((1 + 0.018 * blurfactor) * rcartes.shape[1]), round((1 + 0.018 * blurfactor) * rcartes.shape[0])), Image.ANTIALIAS)
-    bfinal = bfinal.resize((round((1 + 0.044 * blurfactor) * rcartes.shape[1]), round((1 + 0.044 * blurfactor) * rcartes.shape[0])), Image.ANTIALIAS)
+    gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]), round((1 + 0.018 * strength) * rdata.shape[0])), Image.ANTIALIAS)
+    bfinal = bfinal.resize((round((1 + 0.044 * strength) * rdata.shape[1]), round((1 + 0.044 * strength) * rdata.shape[0])), Image.ANTIALIAS)
 
     rheight = rfinal.size[1]
     rwidth = rfinal.size[0]
@@ -177,30 +181,43 @@ def add_chromatic(im, blurfactor = 1):
     im = Image.merge("RGB", (rfinal.crop((-rwdiff, -rhdiff, bwidth - rwdiff, bheight - rhdiff)), gfinal.crop((-gwdiff, -ghdiff, bwidth - gwdiff, bheight - ghdiff)), bfinal))
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
 
-# Get Start Time
-start = time.time()
-if len(sys.argv) < 2:
-    exit()
-ifile = sys.argv[1]
-im = Image.open(ifile)
-print("Original Image details:", im.format, im.size, im.mode)
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description="Apply chromatic aberration and lens blur to images")
+    parser.add_argument("filename", help="input filename")
+    parser.add_argument("-s", "--strength", type=float, default=1.0, help="set blur/aberration strength, defaults to 1.0")
+    parser.add_argument("-n", "--noblur", help="disable radial blur", action="store_true")
+    parser.add_argument("-o", "--output", help="write to OUTPUT (supports multiple formats)")
+    parser.add_argument('-v', '--verbose', help="print status messages", action="store_true")
+    args = parser.parse_args()
+    # Get Start Time
+    start = time.time()
+    ifile = args.filename
+    im = Image.open(ifile)
+    if (args.verbose):
+        print("Original Image:", im.format, im.size, im.mode)
 
-# Ensure width and height are odd numbers
-if (im.size[0] % 2 == 0 or im.size[1] % 2 == 0):
-    print("Dimensions must be odd, automatically cropping...")
-    if (im.size[0] % 2 == 0):
-        im = im.crop((0, 0, im.size[0] - 1, im.size[1]))
-        im.load()
-    if (im.size[1] % 2 == 0):
-        im = im.crop((0, 0, im.size[0], im.size[1] - 1))
-        im.load()
-    print("New dimensions:", im.size)
+    # Ensure width and height are odd numbers
+    if (im.size[0] % 2 == 0 or im.size[1] % 2 == 0):
+        if (args.verbose):
+            print("Dimensions must be odd numbers, cropping...")
+        if (im.size[0] % 2 == 0):
+            im = im.crop((0, 0, im.size[0] - 1, im.size[1]))
+            im.load()
+        if (im.size[1] % 2 == 0):
+            im = im.crop((0, 0, im.size[0], im.size[1] - 1))
+            im.load()
+        if (args.verbose):
+            print("New Dimensions:", im.size)
 
-final_im = add_chromatic(im, blurfactor = 0.5)
+    final_im = add_chromatic(im, strength = args.strength, no_blur = args.noblur)
 
-# Save Final Image
-final_im.save(ifile.split('.')[0] + "_chromatic.jpg", quality=99)
-
-# Get Finish Time
-end = time.time()
-print("Completed in: " + str(end - start) +"s")
+    # Save Final Image
+    if args.output == None:
+        final_im.save(ifile.split('.')[0] + "_chromatic.jpg", quality=99)
+    else:
+        final_im.save(args.output, quality=99)
+    # Get Finish Time
+    end = time.time()
+    if (args.verbose):
+        print("Completed in: " + '% 6.2f' % (end - start) +"s")
