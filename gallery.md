@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src=https://github.com/yoonsikp/chromate/blob/master/samples/tiger_1.0.jpg?raw=true width=60%>
+  <img src=https://github.com/yoonsikp/chromate/blob/master/samples/tiger_1.0.jpg?raw=true width=100%>
   </p>
   <p align="center">
   Image of Tiger (1.0 strength)
