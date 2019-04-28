@@ -79,6 +79,9 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
 
 def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     """Returns the cartesian form of <data>.
+    
+    <width> is the original width of the cartesian image
+    <height> is the original height of the cartesian image
     """
     assert (width > 2)
     assert (height > 2)
@@ -147,7 +150,7 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
 
 def get_gauss(n: int) -> List[float]:
     """Return the Gaussian 1D kernel for a diameter of <n>
-    https://stackoverflow.com/questions/11209115/creating-gaussian-filter-of-required-length-in-python
+    Referenced from: https://stackoverflow.com/questions/11209115/
     """
     sigma = 0.3 * (n/2 - 1) + 0.8
     r = range(-int(n/2), int(n/2)+1)
@@ -160,6 +163,7 @@ def get_gauss(n: int) -> List[float]:
 def vertical_gaussian(data: np.ndarray, n: int) -> np.ndarray:
     """Peforms a Gaussian blur in the vertical direction on <data>. Returns
     the resulting numpy array.
+    
     <n> is the radius, where 1 pixel radius indicates no blur
     """
     padding = n - 1
@@ -181,7 +185,7 @@ def vertical_gaussian(data: np.ndarray, n: int) -> np.ndarray:
     return ret
 
 
-def add_chromatic(im, strength: int = 1, no_blur: bool = False):
+def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     """Splits <im> into red, green, and blue channels, then performs a
     1D Vertical Gaussian blur through a polar representation. Finally,
     it expands the green and blue channels slightly.
