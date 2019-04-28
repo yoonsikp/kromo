@@ -156,12 +156,12 @@ def get_gauss(n:int) -> List[float]:
     return [(1 / (sigma * math.sqrt(2*math.pi)) *
              math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
 
-# n is the radius (1 pixel radius means no blur)
 
 
 def vertical_gaussian(data:np.ndarray, n:int) -> np.ndarray:
     """Peforms a Gaussian blur in the vertical direction on <data>. Returns
-    the resulting numpy array
+    the resulting numpy array.
+    <n> is the radius, where 1 pixel radius indicates no blur
     """
     padding = n - 1
     width = data.shape[1]
