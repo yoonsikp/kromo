@@ -14,6 +14,7 @@ import math
 import time
 from typing import List
 
+
 def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     """Returns the polar form of <data>
     """
@@ -76,7 +77,7 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     return ret
 
 
-def polar_to_cartesian(data: np.ndarray, width:int, height:int) -> np.ndarray:
+def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     """Returns the cartesian form of <data>.
     """
     assert (width > 2)
@@ -144,8 +145,7 @@ def polar_to_cartesian(data: np.ndarray, width:int, height:int) -> np.ndarray:
     return ret
 
 
-
-def get_gauss(n:int) -> List[float]:
+def get_gauss(n: int) -> List[float]:
     """Return the Gaussian 1D kernel for a diameter of <n>
     https://stackoverflow.com/questions/11209115/creating-gaussian-filter-of-required-length-in-python
     """
@@ -157,8 +157,7 @@ def get_gauss(n:int) -> List[float]:
              math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
 
 
-
-def vertical_gaussian(data:np.ndarray, n:int) -> np.ndarray:
+def vertical_gaussian(data: np.ndarray, n: int) -> np.ndarray:
     """Peforms a Gaussian blur in the vertical direction on <data>. Returns
     the resulting numpy array.
     <n> is the radius, where 1 pixel radius indicates no blur
@@ -175,13 +174,14 @@ def vertical_gaussian(data:np.ndarray, n:int) -> np.ndarray:
         radius = round(i * padding / (height - 1)) + 1
         if (radius != old_radius):
             old_radius = radius
-            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)), (width, 1)).transpose()
+            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)),
+                             (width, 1)).transpose()
         ret[i, :] = np.sum(np.multiply(
             padded_data[padding + i - radius + 1:padding + i + radius, :], kernel), axis=0)
     return ret
 
 
-def add_chromatic(im, strength:int = 1, no_blur:bool = False):
+def add_chromatic(im, strength: int = 1, no_blur: bool = False):
     """Splits <im> into red, green, and blue channels, then performs a
     1D Vertical Gaussian blur through a polar representation. Finally,
     it expands the green and blue channels slightly.
