@@ -1,5 +1,5 @@
 # kromo
-`kromo` is a play on words, from "chromatic" and "lo-mo". I made `kromo` because perfect optics are overrated.
+`kromo` is a play on words, combining "chromatic aberration" and "lo-mo photography". I made `kromo` because perfect optics are overrated.
 ## Before & After
 <p align="center">
   <img src=https://github.com/yoonsikp/chromate/blob/master/beforeafter.gif?raw=true width=60%>
