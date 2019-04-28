@@ -2,10 +2,10 @@
 
 
 <p align="center">
-  <img src=https://github.com/yoonsikp/chromate/blob/master/samples/cold_4.0.jpg?raw=true width=60%>
+  <img src=https://github.com/yoonsikp/chromate/blob/master/samples/cold_2.0.jpg?raw=true width=60%>
   </p>
   <p align="center">
-  Screenshot (4.0 strength)
+  Screenshot (2.0 strength)
 </p>
 
 <p align="center">
