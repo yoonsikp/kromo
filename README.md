@@ -19,6 +19,6 @@ Completed in: 67.25719666481018s
 ```
 
 ## Runtime
-`kromo` is slow, just like how film photography used to be. Clone the repo, and get a blast from the past.
+`kromo` is slow, just like how film photography used to be. Clone the repo for a blast from the past.
 
 ## [Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
