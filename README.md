@@ -1,6 +1,6 @@
 # kromo
 `kromo` is a play on words, from "chromatic" and "lo-mo". I made `kromo` because perfect optics are overrated.
-## Samples
+## Before & After
 <p align="center">
   <img src=https://github.com/yoonsikp/chromate/blob/master/beforeafter.gif?raw=true width=60%>
  </p>
@@ -20,3 +20,5 @@ Completed in: 67.25719666481018s
 
 ## Runtime
 `kromo` is slow, just like how film photography used to be. Clone the repo, and get a blast from the past.
+
+## [Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
