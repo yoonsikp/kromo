@@ -7,13 +7,6 @@
  <p align="center">
   Image of Berries, Before - After (1.0 strength)
 </p>
-<p align="center">
-  <img src=https://github.com/yoonsikp/chromate/blob/master/chosen8_chromatic_min.jpg?raw=true width=60%>
-  </p>
-  <p align="center">
-  Image of Flowers (0.5 strength)
-</p>
-
 ## Usage
 ```
 $ python3 kromo.py chosen8.jpg
