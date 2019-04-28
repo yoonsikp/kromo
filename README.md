@@ -7,6 +7,7 @@
  <p align="center">
   Image of Berries, Before - After (1.0 strength)
 </p>
+
 ## Usage
 ```
 $ python3 kromo.py chosen8.jpg
