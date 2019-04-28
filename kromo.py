@@ -4,6 +4,7 @@ import sys
 import math
 import time
 
+
 def cartesian_to_polar(data):
     width = data.shape[1]
     height = data.shape[0]
@@ -19,10 +20,12 @@ def cartesian_to_polar(data):
     # ret[0] = data[halfh, halfw]
     # Don't want to deal with divide by zero errors...
     ret[0:(halfw + 1), halfh] = data[halfh, halfw::-1]
-    ret[0:(halfw + 1), height + width - 2 + halfh] = data[halfh, halfw:(halfw * 2 + 1)]
+    ret[0:(halfw + 1), height + width - 2 +
+        halfh] = data[halfh, halfw:(halfw * 2 + 1)]
     ret[0:(halfh + 1), height - 1 + halfw] = data[halfh:(halfh * 2 + 1), halfw]
     ret[0:(halfh + 1), perimeter - halfw] = data[halfh::-1, halfw]
-    # if we divide the rectangle into 8 triangles, we can do 4 triangles at a time
+    # if we divide the rectangle into 8 triangles
+    # we can do 4 triangles at a time
     # This section is responsible for triangles incl. corners
     for i in range(0, halfh):
         slope = (halfh - i) / (halfw)
@@ -32,11 +35,13 @@ def cartesian_to_polar(data):
         for row in range(halfdiag):
             ystep = round(row * unit_ystep)
             xstep = round(row * unit_xstep)
-            if ( (halfh >= ystep) and halfw >= xstep):
+            if ((halfh >= ystep) and halfw >= xstep):
                 ret[row, i] = data[halfh - ystep, halfw - xstep]
                 ret[row, height - 1 - i] = data[halfh + ystep, halfw - xstep]
-                ret[row, height + width - 2 + i] = data[halfh + ystep, halfw + xstep]
-                ret[row, height + width + height - 3 - i] = data[halfh - ystep, halfw + xstep] 
+                ret[row, height + width - 2 +
+                    i] = data[halfh + ystep, halfw + xstep]
+                ret[row, height + width + height - 3 -
+                    i] = data[halfh - ystep, halfw + xstep]
             else:
                 break
 
@@ -48,14 +53,17 @@ def cartesian_to_polar(data):
         for row in range(halfdiag):
             ystep = round(row * unit_ystep)
             xstep = round(row * unit_xstep)
-            if ( halfw >= xstep and halfh >= ystep ):
+            if (halfw >= xstep and halfh >= ystep):
                 ret[row, height - 1 + j] = data[halfh + ystep, halfw - xstep]
-                ret[row, height + width - 2 - j] = data[halfh + ystep, halfw + xstep]
-                ret[row, height + width + height - 3 + j] = data[halfh - ystep, halfw + xstep]
+                ret[row, height + width - 2 -
+                    j] = data[halfh + ystep, halfw + xstep]
+                ret[row, height + width + height - 3 +
+                    j] = data[halfh - ystep, halfw + xstep]
                 ret[row, perimeter - j] = data[halfh - ystep, halfw - xstep]
             else:
                 break
     return ret
+
 
 def polar_to_cartesian(data, width, height):
     assert (width > 2)
@@ -69,7 +77,8 @@ def polar_to_cartesian(data, width, height):
     ret = np.zeros((height, width))
     # Don't want to deal with divide by zero errors...
     ret[halfh, halfw::-1] = data[0:(halfw + 1), halfh]
-    ret[halfh, halfw:(halfw * 2 + 1)] = data[0:(halfw + 1), height + width - 2 + halfh]
+    ret[halfh, halfw:(halfw * 2 + 1)] = data[0:(halfw + 1),
+                                             height + width - 2 + halfh]
     ret[halfh:(halfh * 2 + 1), halfw] = data[0:(halfh + 1), height - 1 + halfw]
     ret[halfh::-1, halfw] = data[0:(halfh + 1), perimeter - halfw]
 
@@ -82,11 +91,15 @@ def polar_to_cartesian(data, width, height):
         for row in range(halfdiag):
             ystep = round(row * unit_ystep)
             xstep = round(row * unit_xstep)
-            if ( (halfh >= ystep) and halfw >= xstep):
-                ret[halfh - ystep, halfw - xstep] = data[row, i]
-                ret[halfh + ystep, halfw - xstep] = data[row, height - 1 - i]
-                ret[halfh + ystep, halfw + xstep] = data[row, height + width - 2 + i]
-                ret[halfh - ystep, halfw + xstep] = data[row, height + width + height - 3 - i]
+            if ((halfh >= ystep) and halfw >= xstep):
+                ret[halfh - ystep, halfw - xstep] = \
+                    data[row, i]
+                ret[halfh + ystep, halfw - xstep] = \
+                    data[row, height - 1 - i]
+                ret[halfh + ystep, halfw + xstep] = \
+                    data[row, height + width - 2 + i]
+                ret[halfh - ystep, halfw + xstep] = \
+                    data[row, height + width + height - 3 - i]
             else:
                 break
 
@@ -98,27 +111,37 @@ def polar_to_cartesian(data, width, height):
         for row in range(halfdiag):
             ystep = round(row * unit_ystep)
             xstep = round(row * unit_xstep)
-            if ( halfw >= xstep and halfh >= ystep ):
-                ret[halfh + ystep, halfw - xstep] = data[row, height - 1 + j]
-                ret[halfh + ystep, halfw + xstep] = data[row, height + width - 2 - j]
-                ret[halfh - ystep, halfw + xstep] = data[row, height + width + height - 3 + j]
-                ret[halfh - ystep, halfw - xstep] = data[row, perimeter - j]
+            if (halfw >= xstep and halfh >= ystep):
+                ret[halfh + ystep, halfw - xstep] = \
+                    data[row, height - 1 + j]
+                ret[halfh + ystep, halfw + xstep] = \
+                    data[row, height + width - 2 - j]
+                ret[halfh - ystep, halfw + xstep] = \
+                    data[row, height + width + height - 3 + j]
+                ret[halfh - ystep, halfw - xstep] = \
+                    data[row, perimeter - j]
             else:
                 break
     for i in range(1, height - 1):
         for j in range(1, width - 1):
-            if ret[i,j] == 0:
-                ret[i,j] = (ret[i - 1,j] + ret[i + 1,j]) / 2
+            if ret[i, j] == 0:
+                ret[i, j] = (ret[i - 1, j] + ret[i + 1, j]) / 2
     return ret
 
 # https://stackoverflow.com/questions/11209115/creating-gaussian-filter-of-required-length-in-python
+
+
 def get_gauss(n):
     sigma = 0.3 * (n/2 - 1) + 0.8
-    r = range(-int(n/2),int(n/2)+1)
-    new_sum = sum([1 / (sigma * math.sqrt(2*math.pi)) * math.exp(-float(x)**2/(2*sigma**2)) for x in r])
-    return [(1 / (sigma * math.sqrt(2*math.pi)) * math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
+    r = range(-int(n/2), int(n/2)+1)
+    new_sum = sum([1 / (sigma * math.sqrt(2*math.pi)) *
+                   math.exp(-float(x)**2/(2*sigma**2)) for x in r])
+    return [(1 / (sigma * math.sqrt(2*math.pi)) *
+             math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
 
 # n is the radius (1 pixel radius means no blur)
+
+
 def vertical_gaussian(data, n):
     padding = n - 1
     width = data.shape[1]
@@ -132,11 +155,14 @@ def vertical_gaussian(data, n):
         radius = round(i * padding / (height - 1)) + 1
         if (radius != old_radius):
             old_radius = radius
-            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)), (width,1)).transpose()
-        ret[i, :] = np.sum(np.multiply(padded_data[padding + i - (radius - 1):padding + i + radius, :], kernel),axis = 0)
+            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)),
+                             (width, 1)).transpose()
+        ret[i, :] = np.sum(np.multiply(
+            padded_data[padding + i - radius + 1:padding + i + radius, :], kernel), axis=0)
     return ret
 
-def add_chromatic(im, strength = 1, no_blur = False ):
+
+def add_chromatic(im, strength=1, no_blur=False):
     r, g, b = im.split()
     rdata = np.asarray(r)
     gdata = np.asarray(g)
@@ -152,20 +178,25 @@ def add_chromatic(im, strength = 1, no_blur = False ):
 
         bluramount = (im.size[0] + im.size[1] - 2) / 100 * strength
         if round(bluramount) > 0:
-            rpolar = vertical_gaussian(rpolar,round(bluramount))
-            gpolar = vertical_gaussian(gpolar,round(bluramount*1.2))
-            bpolar = vertical_gaussian(bpolar,round(bluramount*1.4))
+            rpolar = vertical_gaussian(rpolar, round(bluramount))
+            gpolar = vertical_gaussian(gpolar, round(bluramount*1.2))
+            bpolar = vertical_gaussian(bpolar, round(bluramount*1.4))
 
-        rcartes = polar_to_cartesian(rpolar, width = rdata.shape[1], height = rdata.shape[0])
-        gcartes = polar_to_cartesian(gpolar, width = gdata.shape[1], height = gdata.shape[0])
-        bcartes = polar_to_cartesian(bpolar, width = bdata.shape[1], height = bdata.shape[0])
+        rcartes = polar_to_cartesian(
+            rpolar, width=rdata.shape[1], height=rdata.shape[0])
+        gcartes = polar_to_cartesian(
+            gpolar, width=gdata.shape[1], height=gdata.shape[0])
+        bcartes = polar_to_cartesian(
+            bpolar, width=bdata.shape[1], height=bdata.shape[0])
 
-        rfinal = Image.fromarray(np.uint8(rcartes) , 'L')
-        gfinal = Image.fromarray(np.uint8(gcartes) , 'L')
-        bfinal = Image.fromarray(np.uint8(bcartes) , 'L')
+        rfinal = Image.fromarray(np.uint8(rcartes), 'L')
+        gfinal = Image.fromarray(np.uint8(gcartes), 'L')
+        bfinal = Image.fromarray(np.uint8(bcartes), 'L')
 
-    gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]), round((1 + 0.018 * strength) * rdata.shape[0])), Image.ANTIALIAS)
-    bfinal = bfinal.resize((round((1 + 0.044 * strength) * rdata.shape[1]), round((1 + 0.044 * strength) * rdata.shape[0])), Image.ANTIALIAS)
+    gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]),
+                            round((1 + 0.018 * strength) * rdata.shape[0])), Image.ANTIALIAS)
+    bfinal = bfinal.resize((round((1 + 0.044 * strength) * rdata.shape[1]),
+                            round((1 + 0.044 * strength) * rdata.shape[0])), Image.ANTIALIAS)
 
     rheight = rfinal.size[1]
     rwidth = rfinal.size[0]
@@ -178,17 +209,26 @@ def add_chromatic(im, strength = 1, no_blur = False ):
     ghdiff = (bheight - gheight) // 2
     gwdiff = (bwidth - gwidth) // 2
 
-    im = Image.merge("RGB", (rfinal.crop((-rwdiff, -rhdiff, bwidth - rwdiff, bheight - rhdiff)), gfinal.crop((-gwdiff, -ghdiff, bwidth - gwdiff, bheight - ghdiff)), bfinal))
+    im = Image.merge("RGB", (
+        rfinal.crop((-rwdiff, -rhdiff, bwidth - rwdiff, bheight - rhdiff)),
+        gfinal.crop((-gwdiff, -ghdiff, bwidth - gwdiff, bheight - ghdiff)),
+        bfinal))
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
+
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description="Apply chromatic aberration and lens blur to images")
+    parser = argparse.ArgumentParser(
+        description="Apply chromatic aberration and lens blur to images")
     parser.add_argument("filename", help="input filename")
-    parser.add_argument("-s", "--strength", type=float, default=1.0, help="set blur/aberration strength, defaults to 1.0")
-    parser.add_argument("-n", "--noblur", help="disable radial blur", action="store_true")
-    parser.add_argument("-o", "--output", help="write to OUTPUT (supports multiple formats)")
-    parser.add_argument('-v', '--verbose', help="print status messages", action="store_true")
+    parser.add_argument("-s", "--strength", type=float, default=1.0,
+                        help="set blur/aberration strength, defaults to 1.0")
+    parser.add_argument(
+        "-n", "--noblur", help="disable radial blur", action="store_true")
+    parser.add_argument(
+        "-o", "--output", help="write to OUTPUT (supports multiple formats)")
+    parser.add_argument(
+        '-v', '--verbose', help="print status messages", action="store_true")
     args = parser.parse_args()
     # Get Start Time
     start = time.time()
@@ -210,7 +250,7 @@ if __name__ == '__main__':
         if (args.verbose):
             print("New Dimensions:", im.size)
 
-    final_im = add_chromatic(im, strength = args.strength, no_blur = args.noblur)
+    final_im = add_chromatic(im, strength=args.strength, no_blur=args.noblur)
 
     # Save Final Image
     if args.output == None:
@@ -220,4 +260,4 @@ if __name__ == '__main__':
     # Get Finish Time
     end = time.time()
     if (args.verbose):
-        print("Completed in: " + '% 6.2f' % (end - start) +"s")
+        print("Completed in: " + '% 6.2f' % (end - start) + "s")
