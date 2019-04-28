@@ -1,11 +1,22 @@
+"""Kromo V0.2
+=== Author ===
+Yoonsik Park
+park.yoonsik@icloud.com
+=== Description ===
+Use the command line interface to add chromatic abberation and
+lens blur to your images, or import some of the functions below.
+"""
+
 from PIL import Image
 import numpy as np
 import sys
 import math
 import time
+from typing import List
 
-
-def cartesian_to_polar(data):
+def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
+    """Returns the polar form of <data>
+    """
     width = data.shape[1]
     height = data.shape[0]
     assert (width > 2)
@@ -65,7 +76,9 @@ def cartesian_to_polar(data):
     return ret
 
 
-def polar_to_cartesian(data, width, height):
+def polar_to_cartesian(data: np.ndarray, width:int, height:int) -> np.ndarray:
+    """Returns the cartesian form of <data>.
+    """
     assert (width > 2)
     assert (height > 2)
     assert (width % 2 == 1)
@@ -122,16 +135,20 @@ def polar_to_cartesian(data, width, height):
                     data[row, perimeter - j]
             else:
                 break
+
+    # Repairs black dots in transformed image
     for i in range(1, height - 1):
         for j in range(1, width - 1):
             if ret[i, j] == 0:
                 ret[i, j] = (ret[i - 1, j] + ret[i + 1, j]) / 2
     return ret
 
-# https://stackoverflow.com/questions/11209115/creating-gaussian-filter-of-required-length-in-python
 
 
-def get_gauss(n):
+def get_gauss(n:int) -> List[float]:
+    """Return the Gaussian 1D kernel for a diameter of <n>
+    https://stackoverflow.com/questions/11209115/creating-gaussian-filter-of-required-length-in-python
+    """
     sigma = 0.3 * (n/2 - 1) + 0.8
     r = range(-int(n/2), int(n/2)+1)
     new_sum = sum([1 / (sigma * math.sqrt(2*math.pi)) *
@@ -142,7 +159,10 @@ def get_gauss(n):
 # n is the radius (1 pixel radius means no blur)
 
 
-def vertical_gaussian(data, n):
+def vertical_gaussian(data:np.ndarray, n:int) -> np.ndarray:
+    """Peforms a Gaussian blur in the vertical direction on <data>. Returns
+    the resulting numpy array
+    """
     padding = n - 1
     width = data.shape[1]
     height = data.shape[0]
@@ -155,14 +175,20 @@ def vertical_gaussian(data, n):
         radius = round(i * padding / (height - 1)) + 1
         if (radius != old_radius):
             old_radius = radius
-            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)),
-                             (width, 1)).transpose()
+            kernel = np.tile(get_gauss(1 + 2 * (radius - 1)), (width, 1)).transpose()
         ret[i, :] = np.sum(np.multiply(
             padded_data[padding + i - radius + 1:padding + i + radius, :], kernel), axis=0)
     return ret
 
 
-def add_chromatic(im, strength=1, no_blur=False):
+def add_chromatic(im, strength:int = 1, no_blur:bool = False):
+    """Splits <im> into red, green, and blue channels, then performs a
+    1D Vertical Gaussian blur through a polar representation. Finally,
+    it expands the green and blue channels slightly.
+
+    <strength> determines the amount of expansion and blurring.
+    <no_blur> disables the radial blur
+    """
     r, g, b = im.split()
     rdata = np.asarray(r)
     gdata = np.asarray(g)
@@ -198,12 +224,9 @@ def add_chromatic(im, strength=1, no_blur=False):
     bfinal = bfinal.resize((round((1 + 0.044 * strength) * rdata.shape[1]),
                             round((1 + 0.044 * strength) * rdata.shape[0])), Image.ANTIALIAS)
 
-    rheight = rfinal.size[1]
-    rwidth = rfinal.size[0]
-    gheight = gfinal.size[1]
-    gwidth = gfinal.size[0]
-    bheight = bfinal.size[1]
-    bwidth = bfinal.size[0]
+    rwidth, rheight = rfinal.size
+    gwidth, gheight = gfinal.size
+    bwidth, bheight = bfinal.size
     rhdiff = (bheight - rheight) // 2
     rwdiff = (bwidth - rwidth) // 2
     ghdiff = (bheight - gheight) // 2
