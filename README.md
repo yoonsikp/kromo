@@ -1,8 +1,6 @@
 # kromo
-A play on words between "chromatic" and "lo-mo". Provides a nice artificial lens blur/chromatic aberration
-<video controls>
-  <source src="https://github.com/yoonsikp/chromate/blob/master/output.mp4?raw=true>" type="video/mp4"></video>
-
+A play on words between "chromatic" and "lo-mo".
+## Samples
 <p align="center">
   <img src=https://github.com/yoonsikp/chromate/blob/master/output.gif?raw=true width=50%>
  </p>
@@ -15,8 +13,6 @@ A play on words between "chromatic" and "lo-mo". Provides a nice artificial lens
   <p align="center">
   Image of Flowers, 0.5 strength
 </p>
-
-
 ## Usage
 ```
 $ python3 kromo.py chosen8.jpg
