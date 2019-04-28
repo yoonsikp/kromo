@@ -15,3 +15,14 @@ Provides a nice artificial lens blur/chromatic aberration
   <p align="center">
   Image of Flowers, 0.5 strength
 </p>
+
+
+## Usage
+```
+$ python3 chromatic_ab.py chosen8.jpg
+
+Original Image details: JPEG (1962, 2615) RGB
+Dimensions must be odd, automatically cropping...
+New dimensions: (1961, 2615)
+Completed in: 67.25719666481018s
+```
