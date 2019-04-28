@@ -8,6 +8,8 @@
   Image of Berries, 1.0 strength
 </p>
 
+## [Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
+
 ## Quick Start
 ```
 $ python3 kromo.py -v flower.jpg 
@@ -42,8 +44,6 @@ optional arguments:
 
 ## Runtime
 `kromo` is slow, just like how film photography used to be. Clone the repo for a blast from the past.
-
-## [Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
 
 ## See also
 [Circular & radial blur](http://chemaguerra.com/circular-radial-blur/)
