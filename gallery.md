@@ -1,5 +1,11 @@
 # Gallery
 
+<p align="center">
+  <img src=https://github.com/yoonsikp/chromate/blob/master/samples/comparison.jpg?raw=true width=100%>
+  </p>
+  <p align="center">
+  Real Lens Aberration vs Kromo (3.0 strength)
+</p>
 
 <p align="center">
   <img src=https://github.com/yoonsikp/chromate/blob/master/samples/cold_2.0.jpg?raw=true width=60%>
