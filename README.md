@@ -19,7 +19,7 @@ A play on words between "chromatic" and "lo-mo". Provides a nice artificial lens
 
 ## Usage
 ```
-$ python3 chromatic_ab.py chosen8.jpg
+$ python3 kromo.py chosen8.jpg
 
 Original Image details: JPEG (1962, 2615) RGB
 Dimensions must be odd, automatically cropping...
