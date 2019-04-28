@@ -29,16 +29,17 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     halfw = width // 2
     halfh = height // 2
     ret = np.zeros((halfdiag, perimeter))
-    # ret[0] = data[halfh, halfw]
+
     # Don't want to deal with divide by zero errors...
     ret[0:(halfw + 1), halfh] = data[halfh, halfw::-1]
     ret[0:(halfw + 1), height + width - 2 +
         halfh] = data[halfh, halfw:(halfw * 2 + 1)]
     ret[0:(halfh + 1), height - 1 + halfw] = data[halfh:(halfh * 2 + 1), halfw]
     ret[0:(halfh + 1), perimeter - halfw] = data[halfh::-1, halfw]
-    # if we divide the rectangle into 8 triangles
-    # we can do 4 triangles at a time
-    # This section is responsible for triangles incl. corners
+    
+    # Divide the image into 8 triangles, and use the same calculation on
+    # 4 triangles at a time. This is possible due to symmetry.
+    # This section is also responsible for the corner pixels
     for i in range(0, halfh):
         slope = (halfh - i) / (halfw)
         diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
@@ -56,7 +57,8 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
                     i] = data[halfh - ystep, halfw + xstep]
             else:
                 break
-
+                
+    # Remaining 4 triangles
     for j in range(1, halfw):
         slope = (halfh) / (halfw - j)
         diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
@@ -92,6 +94,7 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     halfw = width // 2
     halfh = height // 2
     ret = np.zeros((height, width))
+    
     # Don't want to deal with divide by zero errors...
     ret[halfh, halfw::-1] = data[0:(halfw + 1), halfh]
     ret[halfh, halfw:(halfw * 2 + 1)] = data[0:(halfw + 1),
@@ -99,7 +102,7 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     ret[halfh:(halfh * 2 + 1), halfw] = data[0:(halfh + 1), height - 1 + halfw]
     ret[halfh::-1, halfw] = data[0:(halfh + 1), perimeter - halfw]
 
-    # This section is responsible for triangles incl. corners
+    # Same code as above, except the order of the assignments are switched
     for i in range(0, halfh):
         slope = (halfh - i) / (halfw)
         diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
@@ -140,7 +143,7 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
             else:
                 break
 
-    # Repairs black dots in transformed image
+    # Repairs black/missing pixels in the transformed image
     for i in range(1, height - 1):
         for j in range(1, width - 1):
             if ret[i, j] == 0:
@@ -156,6 +159,7 @@ def get_gauss(n: int) -> List[float]:
     r = range(-int(n/2), int(n/2)+1)
     new_sum = sum([1 / (sigma * math.sqrt(2*math.pi)) *
                    math.exp(-float(x)**2/(2*sigma**2)) for x in r])
+    # Ensure that the gaussian array adds up to one
     return [(1 / (sigma * math.sqrt(2*math.pi)) *
              math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
 
@@ -176,6 +180,7 @@ def vertical_gaussian(data: np.ndarray, n: int) -> np.ndarray:
     old_radius = - 1
     for i in range(height):
         radius = round(i * padding / (height - 1)) + 1
+        # Recreate new kernel only if we have to
         if (radius != old_radius):
             old_radius = radius
             kernel = np.tile(get_gauss(1 + 2 * (radius - 1)),
@@ -198,6 +203,7 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     gdata = np.asarray(g)
     bdata = np.asarray(b)
     if no_blur:
+        # channels remain unchanged
         rfinal = r
         gfinal = g
         bfinal = b
@@ -222,7 +228,8 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
         rfinal = Image.fromarray(np.uint8(rcartes), 'L')
         gfinal = Image.fromarray(np.uint8(gcartes), 'L')
         bfinal = Image.fromarray(np.uint8(bcartes), 'L')
-
+    
+    # enlarge the green and blue channels slightly, blue being the most enlarged
     gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]),
                             round((1 + 0.018 * strength) * rdata.shape[0])), Image.ANTIALIAS)
     bfinal = bfinal.resize((round((1 + 0.044 * strength) * rdata.shape[1]),
@@ -235,11 +242,14 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     rwdiff = (bwidth - rwidth) // 2
     ghdiff = (bheight - gheight) // 2
     gwdiff = (bwidth - gwidth) // 2
-
+    
+    # Centre the channels
     im = Image.merge("RGB", (
         rfinal.crop((-rwdiff, -rhdiff, bwidth - rwdiff, bheight - rhdiff)),
         gfinal.crop((-gwdiff, -ghdiff, bwidth - gwdiff, bheight - ghdiff)),
         bfinal))
+    
+    # Crop the image to the original image dimensions
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
 
 
