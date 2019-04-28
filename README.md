@@ -11,5 +11,7 @@ Provides a nice artificial lens blur/chromatic aberration
 </p>
 <p align="center">
   <img src=https://github.com/yoonsikp/chromate/blob/master/chosen8_chromatic.jpg?raw=true width=50%>
+  </p>
+  <p align="center">
   Image of Flowers, 0.5 strength
 </p>
