@@ -13,6 +13,7 @@ A play on words between "chromatic" and "lo-mo".
   <p align="center">
   Image of Flowers, 0.5 strength
 </p>
+
 ## Usage
 ```
 $ python3 kromo.py chosen8.jpg
