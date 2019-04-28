@@ -44,3 +44,6 @@ optional arguments:
 `kromo` is slow, just like how film photography used to be. Clone the repo for a blast from the past.
 
 ## [Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
+
+## See also
+[Circular & radial blur](http://chemaguerra.com/circular-radial-blur/)
