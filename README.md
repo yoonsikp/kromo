@@ -23,3 +23,6 @@ Dimensions must be odd, automatically cropping...
 New dimensions: (1961, 2615)
 Completed in: 67.25719666481018s
 ```
+
+## Runtime
+`kromo` is slow, just like how film photography used to be.
