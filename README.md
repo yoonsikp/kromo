@@ -2,7 +2,7 @@
 `kromo` is a play on words, combining "chromatic aberration" and "lo-mo photography". I made `kromo` because perfect optics are overrated.
 ## Before & After
 <p align="center">
-  <img src=https://github.com/yoonsikp/chromate/blob/master/beforeafter.gif?raw=true width=60%>
+  <img src=https://github.com/yoonsikp/kromo/blob/master/beforeafter.gif?raw=true width=60%>
  </p>
  <p align="center">
   Image of Berries, 1.0 strength
