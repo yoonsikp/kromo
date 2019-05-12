@@ -45,5 +45,7 @@ optional arguments:
 ## Runtime
 `kromo` is slow, just like how film photography used to be. Clone the repo for a blast from the past.
 
+The time complexity is O(n), so a 12MP picture takes 4 times longer than a 3MP picture.
+
 ## See also
 [Circular & radial blur](http://chemaguerra.com/circular-radial-blur/)
