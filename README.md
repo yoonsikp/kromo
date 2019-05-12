@@ -49,3 +49,4 @@ The time complexity is O(n), so a 12MP picture takes 4 times longer than a 3MP p
 
 ## See also
 [Circular & radial blur](http://chemaguerra.com/circular-radial-blur/)
+[Use depth-of-field and other lens effects](https://doc.babylonjs.com/how_to/using_depth-of-field_and_other_lens_effects)
