@@ -13,7 +13,7 @@ import sys
 import math
 import time
 from typing import List
-
+import os
 
 def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     """Returns the polar form of <data>
@@ -252,6 +252,23 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     # Crop the image to the original image dimensions
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
 
+def add_jitter(im, strength: int = 1):
+    """Adds a small pixel offset to the Red and Blue channels of <im>,
+    causing a classic chromatic fringe effect. Very cheap computationally.
+
+    <strength> how strongly to offset the Red and Blue channels
+    """
+    if strength == 0.0:
+        return im
+    r, g, b = im.split()
+    rwidth, rheight = r.size
+    gwidth, gheight = g.size
+    bwidth, bheight = b.size
+    im = Image.merge("RGB", (
+        r.crop((strength, 0, rwidth + strength, rheight)),
+        g.crop((0, 0, gwidth, gheight)),
+        b.crop((-strength, 0, bwidth - strength, bheight))))
+    return im
 
 if __name__ == '__main__':
     import argparse
@@ -260,6 +277,10 @@ if __name__ == '__main__':
     parser.add_argument("filename", help="input filename")
     parser.add_argument("-s", "--strength", type=float, default=1.0,
                         help="set blur/aberration strength, defaults to 1.0")
+    parser.add_argument("-j", "--jitter", type=int, default=0,
+                        help="set color channel offset pixels, defaults to 0")
+    # parser.add_argument("-y", "--overlay", type=float, default=0,
+    #                     help="alpha overlay of original image, defaults to 0.0 (max 1.0)")
     parser.add_argument(
         "-n", "--noblur", help="disable radial blur", action="store_true")
     parser.add_argument(
@@ -287,11 +308,14 @@ if __name__ == '__main__':
         if (args.verbose):
             print("New Dimensions:", im.size)
 
-    final_im = add_chromatic(im, strength=args.strength, no_blur=args.noblur)
+    im = add_chromatic(im, strength=args.strength, no_blur=args.noblur)
+
+    # Add Jitter Effect
+    final_im = add_jitter(im, strength = args.jitter)
 
     # Save Final Image
     if args.output == None:
-        final_im.save(ifile.split('.')[0] + "_chromatic.jpg", quality=99)
+        final_im.save(os.path.splitext(ifile)[0] + "_chromatic.jpg", quality=99)
     else:
         final_im.save(args.output, quality=99)
     # Get Finish Time
