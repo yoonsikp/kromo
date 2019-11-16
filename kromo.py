@@ -1,4 +1,4 @@
-"""Kromo V0.2
+"""Kromo V0.3
 === Author ===
 Yoonsik Park
 park.yoonsik@icloud.com
