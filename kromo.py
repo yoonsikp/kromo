@@ -343,10 +343,10 @@ if __name__ == '__main__':
     im = blend_images(im, og_im, alpha = args.overlay, strength=args.strength)
 
     # Save Final Image
-    if args.output == None:
+    if args.out == None:
         im.save(os.path.splitext(ifile)[0] + "_chromatic.jpg", quality=99)
     else:
-        im.save(args.output, quality=99)
+        im.save(args.out, quality=99)
     # Get Finish Time
     end = time.time()
     if (args.verbose):
