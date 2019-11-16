@@ -25,8 +25,7 @@ Completed in:  80.14s
 ```
 $ python3 kromo.py --help
 
-usage: kromo.py [-h] [-s STRENGTH] [-j JITTER] [-y OVERLAY] [-n] [-o OUTPUT]
-                [-v]
+usage: kromo.py [-h] [-s STRENGTH] [-j JITTER] [-y OVERLAY] [-n] [-o OUT] [-v]
                 filename
 
 Apply chromatic aberration and lens blur to images
@@ -41,10 +40,9 @@ optional arguments:
   -j JITTER, --jitter JITTER
                         set color channel offset pixels, defaults to 0
   -y OVERLAY, --overlay OVERLAY
-                        alpha of original image overlay, defaults to 1.0
+                        alpha of original image overlay, defaults to 0.0
   -n, --noblur          disable radial blur
-  -o OUTPUT, --output OUTPUT
-                        write to OUTPUT (supports multiple formats)
+  -o OUT, --out OUT     write to OUTPUT (supports multiple formats)
   -v, --verbose         print status messages
 ```
 

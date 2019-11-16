@@ -299,12 +299,12 @@ if __name__ == '__main__':
                         help="set blur/aberration strength, defaults to 1.0")
     parser.add_argument("-j", "--jitter", type=int, default=0,
                         help="set color channel offset pixels, defaults to 0")
-    parser.add_argument("-y", "--overlay", type=float, default=1.0,
-                        help="alpha of original image overlay, defaults to 1.0")
+    parser.add_argument("-y", "--overlay", type=float, default=0.0,
+                        help="alpha of original image overlay, defaults to 0.0")
     parser.add_argument(
         "-n", "--noblur", help="disable radial blur", action="store_true")
     parser.add_argument(
-        "-o", "--output", help="write to OUTPUT (supports multiple formats)")
+        "-o", "--out", help="write to OUTPUT (supports multiple formats)")
     parser.add_argument(
         '-v', '--verbose', help="print status messages", action="store_true")
     args = parser.parse_args()
