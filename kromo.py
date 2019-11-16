@@ -252,23 +252,43 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     # Crop the image to the original image dimensions
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
 
-def add_jitter(im, strength: int = 1):
+def add_jitter(im, pixels: int = 1):
     """Adds a small pixel offset to the Red and Blue channels of <im>,
-    causing a classic chromatic fringe effect. Very cheap computationally.
+    resulting in a classic chromatic fringe effect. Very cheap computationally.
 
-    <strength> how strongly to offset the Red and Blue channels
+    <pixels> how many pixels to offset the Red and Blue channels
     """
-    if strength == 0.0:
-        return im
+    if pixels == 0:
+        return im.copy()
     r, g, b = im.split()
     rwidth, rheight = r.size
     gwidth, gheight = g.size
     bwidth, bheight = b.size
     im = Image.merge("RGB", (
-        r.crop((strength, 0, rwidth + strength, rheight)),
+        r.crop((pixels, 0, rwidth + pixels, rheight)),
         g.crop((0, 0, gwidth, gheight)),
-        b.crop((-strength, 0, bwidth - strength, bheight))))
+        b.crop((-pixels, 0, bwidth - pixels, bheight))))
     return im
+
+def blend_images(im, og_im, alpha: float = 1, strength: float = 1):
+    """Blends original image <og_im> as an overlay over <im>, with
+    an alpha value of <alpha>. Resizes <og_im> with respect to <strength>,
+    before adding it as an overlay. 
+    """
+    og_im.putalpha(int(255 * alpha))
+    og_im = og_im.resize((round((1 + 0.018 * strength) * og_im.size[0]),
+                          round((1 + 0.018 * strength) * og_im.size[1])), Image.ANTIALIAS)
+    
+    hdiff = (og_im.size[1] - im.size[1]) // 2
+    wdiff = (og_im.size[0] - im.size[0]) // 2
+    og_im = og_im.crop((wdiff, hdiff, wdiff + im.size[0], hdiff + im.size[1]))
+    im = im.convert('RGBA')
+
+    final_im = Image.new("RGBA", im.size)
+    final_im = Image.alpha_composite(final_im, im)
+    final_im = Image.alpha_composite(final_im, og_im)
+    final_im = final_im.convert('RGB')
+    return final_im
 
 if __name__ == '__main__':
     import argparse
@@ -279,8 +299,8 @@ if __name__ == '__main__':
                         help="set blur/aberration strength, defaults to 1.0")
     parser.add_argument("-j", "--jitter", type=int, default=0,
                         help="set color channel offset pixels, defaults to 0")
-    # parser.add_argument("-y", "--overlay", type=float, default=0,
-    #                     help="alpha overlay of original image, defaults to 0.0 (max 1.0)")
+    parser.add_argument("-y", "--overlay", type=float, default=1.0,
+                        help="alpha of original image overlay, defaults to 1.0")
     parser.add_argument(
         "-n", "--noblur", help="disable radial blur", action="store_true")
     parser.add_argument(
@@ -294,6 +314,11 @@ if __name__ == '__main__':
     im = Image.open(ifile)
     if (args.verbose):
         print("Original Image:", im.format, im.size, im.mode)
+    
+    if (im.mode != 'RGB'):
+        if (args.verbose):
+            print("Converting to RGB...")
+        im = im.convert('RGB')
 
     # Ensure width and height are odd numbers
     if (im.size[0] % 2 == 0 or im.size[1] % 2 == 0):
@@ -308,16 +333,20 @@ if __name__ == '__main__':
         if (args.verbose):
             print("New Dimensions:", im.size)
 
+    og_im = im.copy()
+
     im = add_chromatic(im, strength=args.strength, no_blur=args.noblur)
 
     # Add Jitter Effect
-    final_im = add_jitter(im, strength = args.jitter)
+    im = add_jitter(im, pixels = args.jitter)
+
+    im = blend_images(im, og_im, alpha = args.overlay, strength=args.strength)
 
     # Save Final Image
     if args.output == None:
-        final_im.save(os.path.splitext(ifile)[0] + "_chromatic.jpg", quality=99)
+        im.save(os.path.splitext(ifile)[0] + "_chromatic.jpg", quality=99)
     else:
-        final_im.save(args.output, quality=99)
+        im.save(args.output, quality=99)
     # Get Finish Time
     end = time.time()
     if (args.verbose):
