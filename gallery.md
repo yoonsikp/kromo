@@ -1,10 +1,17 @@
 # Gallery
 
 <p align="center">
-  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/comparison.jpg?raw=true width=100%>
+  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/comparison.jpg?raw=true width=80%>
   </p>
   <p align="center">
   Real Lens Aberration vs Kromo (3.0 strength)
+</p>
+
+<p align="center">
+  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/lena.jpg?raw=true width=80%>
+  </p>
+  <p align="center">
+  Image of Lena (1.5 strength, 1 pixel jitter, 0.1 overlay)
 </p>
 
 
@@ -23,9 +30,3 @@
   Image of Flowers (0.5 strength)
 </p>
 
-<p align="center">
-  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/lena.jpg?raw=true width=60%>
-  </p>
-  <p align="center">
-  Image of Lena (1.5 strength, 1 pixel jitter, 0.1 overlay)
-</p>
