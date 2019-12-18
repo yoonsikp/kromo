@@ -23,10 +23,3 @@
 </p>
 
 
-<p align="center">
-  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/flower_0.5.jpg?raw=true width=60%>
-  </p>
-  <p align="center">
-  Image of Flowers (0.5 strength)
-</p>
-
