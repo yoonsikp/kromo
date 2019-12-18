@@ -24,8 +24,8 @@
 </p>
 
 <p align="center">
-  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/laptop_chromatic.jpg?raw=true width=60%>
+  <img src=https://github.com/yoonsikp/kromo/blob/master/samples/lena.jpg?raw=true width=60%>
   </p>
   <p align="center">
-  Image of Laptop (1.0 strength, 1 pixel jitter, 0.2 overlay)
+  Image of Lena (1.5 strength, 1 pixel jitter, 0.1 overlay)
 </p>
