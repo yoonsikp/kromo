@@ -12,6 +12,7 @@
 
 ## Quick Start
 ```
+$ pip3 install -r requirements.txt
 $ python3 kromo.py -v flower.jpg 
 
 Original Image: JPEG (1962, 2615) RGB
