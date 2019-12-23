@@ -8,7 +8,7 @@
   Image of Berries, 1.0 strength
 </p>
 
-## [Image Gallery](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
+## [More Images](https://github.com/yoonsikp/kromo/blob/master/gallery.md)
 
 ## Quick Start
 ```
