@@ -9,11 +9,11 @@ lens blur to your images, or import some of the functions below.
 
 from PIL import Image
 import numpy as np
-import sys
 import math
 import time
 from typing import List
 import os
+
 
 def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     """Returns the polar form of <data>
@@ -28,21 +28,21 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
     halfdiag = math.ceil(((width ** 2 + height ** 2) ** 0.5) / 2)
     halfw = width // 2
     halfh = height // 2
-    ret = np.zeros((halfdiag, perimeter))
+    ret = np.zeros((halfdiag, perimeter, 3))
 
     # Don't want to deal with divide by zero errors...
     ret[0:(halfw + 1), halfh] = data[halfh, halfw::-1]
     ret[0:(halfw + 1), height + width - 2 +
-        halfh] = data[halfh, halfw:(halfw * 2 + 1)]
+                       halfh] = data[halfh, halfw:(halfw * 2 + 1)]
     ret[0:(halfh + 1), height - 1 + halfw] = data[halfh:(halfh * 2 + 1), halfw]
     ret[0:(halfh + 1), perimeter - halfw] = data[halfh::-1, halfw]
-    
+
     # Divide the image into 8 triangles, and use the same calculation on
     # 4 triangles at a time. This is possible due to symmetry.
     # This section is also responsible for the corner pixels
     for i in range(0, halfh):
         slope = (halfh - i) / (halfw)
-        diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
+        diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
         unit_xstep = diagx / (halfdiag - 1)
         unit_ystep = diagx * slope / (halfdiag - 1)
         for row in range(halfdiag):
@@ -57,11 +57,11 @@ def cartesian_to_polar(data: np.ndarray) -> np.ndarray:
                     i] = data[halfh - ystep, halfw + xstep]
             else:
                 break
-                
+
     # Remaining 4 triangles
     for j in range(1, halfw):
         slope = (halfh) / (halfw - j)
-        diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
+        diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
         unit_xstep = diagx / (halfdiag - 1)
         unit_ystep = diagx * slope / (halfdiag - 1)
         for row in range(halfdiag):
@@ -93,61 +93,85 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     halfdiag = math.ceil(((width ** 2 + height ** 2) ** 0.5) / 2)
     halfw = width // 2
     halfh = height // 2
-    ret = np.zeros((height, width))
-    
-    # Don't want to deal with divide by zero errors...
-    ret[halfh, halfw::-1] = data[0:(halfw + 1), halfh]
-    ret[halfh, halfw:(halfw * 2 + 1)] = data[0:(halfw + 1),
-                                             height + width - 2 + halfh]
-    ret[halfh:(halfh * 2 + 1), halfw] = data[0:(halfh + 1), height - 1 + halfw]
-    ret[halfh::-1, halfw] = data[0:(halfh + 1), perimeter - halfw]
+    ret = np.zeros((height, width, 3))
+
+    def div0():
+        # Don't want to deal with divide by zero errors...
+        ret[halfh, halfw::-1] = data[0:(halfw + 1), halfh]
+        ret[halfh, halfw:(halfw * 2 + 1)] = data[0:(halfw + 1),
+                                            height + width - 2 + halfh]
+        ret[halfh:(halfh * 2 + 1), halfw] = data[0:(halfh + 1), height - 1 + halfw]
+        ret[halfh::-1, halfw] = data[0:(halfh + 1), perimeter - halfw]
+
+    div0()
 
     # Same code as above, except the order of the assignments are switched
-    for i in range(0, halfh):
-        slope = (halfh - i) / (halfw)
-        diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
-        unit_xstep = diagx / (halfdiag - 1)
-        unit_ystep = diagx * slope / (halfdiag - 1)
-        for row in range(halfdiag):
-            ystep = round(row * unit_ystep)
-            xstep = round(row * unit_xstep)
-            if ((halfh >= ystep) and halfw >= xstep):
-                ret[halfh - ystep, halfw - xstep] = \
-                    data[row, i]
-                ret[halfh + ystep, halfw - xstep] = \
-                    data[row, height - 1 - i]
-                ret[halfh + ystep, halfw + xstep] = \
-                    data[row, height + width - 2 + i]
-                ret[halfh - ystep, halfw + xstep] = \
-                    data[row, height + width + height - 3 - i]
-            else:
-                break
+    def part1():
+        # slope = np.arange(halfh - 1, -1, -1) / halfw
+        # diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
+        # unit_xstep = diagx / (halfdiag - 1)
+        # unit_ystep = diagx * slope / (halfdiag - 1)
+        # row = np.arange(0, halfdiag)
+        # ystep = np.round(row * unit_ystep)
+        # xstep = np.round(row * unit_xstep)
 
-    for j in range(1, halfw):
-        slope = (halfh) / (halfw - j)
-        diagx = ((halfdiag ** 2)/(slope ** 2 + 1)) ** 0.5
-        unit_xstep = diagx / (halfdiag - 1)
-        unit_ystep = diagx * slope / (halfdiag - 1)
-        for row in range(halfdiag):
-            ystep = round(row * unit_ystep)
-            xstep = round(row * unit_xstep)
-            if (halfw >= xstep and halfh >= ystep):
-                ret[halfh + ystep, halfw - xstep] = \
-                    data[row, height - 1 + j]
-                ret[halfh + ystep, halfw + xstep] = \
-                    data[row, height + width - 2 - j]
-                ret[halfh - ystep, halfw + xstep] = \
-                    data[row, height + width + height - 3 + j]
-                ret[halfh - ystep, halfw - xstep] = \
-                    data[row, perimeter - j]
-            else:
-                break
+        for i in range(0, halfh):
+            slope = (halfh - i) / (halfw)
+            diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
+            unit_xstep = diagx / (halfdiag - 1)
+            unit_ystep = diagx * slope / (halfdiag - 1)
+            # ystep = np.round(np.arange(0, halfh, unit_ystep)).astype(int)
+            # xstep = np.round(np.arange(0, halfw, unit_xstep)).astype(int)
+            # length = min(ystep[-1], xstep[-1], halfdiag)
+            # xstep = xstep[:length]
+            # ret[halfh - ystep, halfw - xstep] = data[row, i]
+            for row in range(halfdiag):
+                ystep = round(row * unit_ystep)
+                xstep = round(row * unit_xstep)
+                if ((halfh >= ystep) and halfw >= xstep):
+                    ret[halfh - ystep, halfw - xstep] = \
+                        data[row, i]
+                    ret[halfh + ystep, halfw - xstep] = \
+                        data[row, height - 1 - i]
+                    ret[halfh + ystep, halfw + xstep] = \
+                        data[row, height + width - 2 + i]
+                    ret[halfh - ystep, halfw + xstep] = \
+                        data[row, height + width + height - 3 - i]
+                else:
+                    break
+
+    part1()
+
+    def part2():
+        for j in range(1, halfw):
+            slope = (halfh) / (halfw - j)
+            diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
+            unit_xstep = diagx / (halfdiag - 1)
+            unit_ystep = diagx * slope / (halfdiag - 1)
+            for row in range(halfdiag):
+                ystep = round(row * unit_ystep)
+                xstep = round(row * unit_xstep)
+                if (halfw >= xstep and halfh >= ystep):
+                    ret[halfh + ystep, halfw - xstep] = \
+                        data[row, height - 1 + j]
+                    ret[halfh + ystep, halfw + xstep] = \
+                        data[row, height + width - 2 - j]
+                    ret[halfh - ystep, halfw + xstep] = \
+                        data[row, height + width + height - 3 + j]
+                    ret[halfh - ystep, halfw - xstep] = \
+                        data[row, perimeter - j]
+                else:
+                    break
+
+    part2()
 
     # Repairs black/missing pixels in the transformed image
-    for i in range(1, height - 1):
-        for j in range(1, width - 1):
-            if ret[i, j] == 0:
-                ret[i, j] = (ret[i - 1, j] + ret[i + 1, j]) / 2
+    def set_zeros():
+        zero_mask = ret[1:-1, 1:-1] == 0
+        ret[1:-1, 1:-1] = np.where(zero_mask, (ret[:-2, 1:-1] + ret[2:, 1:-1]) / 2, ret[1:-1, 1:-1])
+
+    set_zeros()
+
     return ret
 
 
@@ -155,13 +179,13 @@ def get_gauss(n: int) -> List[float]:
     """Return the Gaussian 1D kernel for a diameter of <n>
     Referenced from: https://stackoverflow.com/questions/11209115/
     """
-    sigma = 0.3 * (n/2 - 1) + 0.8
-    r = range(-int(n/2), int(n/2)+1)
-    new_sum = sum([1 / (sigma * math.sqrt(2*math.pi)) *
-                   math.exp(-float(x)**2/(2*sigma**2)) for x in r])
+    sigma = 0.3 * (n / 2 - 1) + 0.8
+    r = range(-int(n / 2), int(n / 2) + 1)
+    new_sum = sum([1 / (sigma * math.sqrt(2 * math.pi)) *
+                   math.exp(-float(x) ** 2 / (2 * sigma ** 2)) for x in r])
     # Ensure that the gaussian array adds up to one
-    return [(1 / (sigma * math.sqrt(2*math.pi)) *
-             math.exp(-float(x)**2/(2*sigma**2))) / new_sum for x in r]
+    return [(1 / (sigma * math.sqrt(2 * math.pi)) *
+             math.exp(-float(x) ** 2 / (2 * sigma ** 2))) / new_sum for x in r]
 
 
 def vertical_gaussian(data: np.ndarray, n: int) -> np.ndarray:
@@ -208,27 +232,26 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
         gfinal = g
         bfinal = b
     else:
-        rpolar = cartesian_to_polar(rdata)
-        gpolar = cartesian_to_polar(gdata)
-        bpolar = cartesian_to_polar(bdata)
+        poles = cartesian_to_polar(np.stack([rdata, gdata, bdata], axis=-1))
+        rpolar, gpolar, bpolar = poles[:, :, 0], poles[:, :, 1], poles[:, :, 2],
 
         bluramount = (im.size[0] + im.size[1] - 2) / 100 * strength
         if round(bluramount) > 0:
             rpolar = vertical_gaussian(rpolar, round(bluramount))
-            gpolar = vertical_gaussian(gpolar, round(bluramount*1.2))
-            bpolar = vertical_gaussian(bpolar, round(bluramount*1.4))
+            gpolar = vertical_gaussian(gpolar, round(bluramount * 1.2))
+            bpolar = vertical_gaussian(bpolar, round(bluramount * 1.4))
 
-        rcartes = polar_to_cartesian(
-            rpolar, width=rdata.shape[1], height=rdata.shape[0])
-        gcartes = polar_to_cartesian(
-            gpolar, width=gdata.shape[1], height=gdata.shape[0])
-        bcartes = polar_to_cartesian(
-            bpolar, width=bdata.shape[1], height=bdata.shape[0])
+        rgbpolar = np.stack([rpolar, gpolar, bpolar], axis=-1)
+        cartes = polar_to_cartesian(rgbpolar, width=rdata.shape[1], height=rdata.shape[0])
+        rcartes, gcartes, bcartes = cartes[:, :, 0], cartes[:, :, 1], cartes[:, :, 2],
 
         rfinal = Image.fromarray(np.uint8(rcartes), 'L')
         gfinal = Image.fromarray(np.uint8(gcartes), 'L')
         bfinal = Image.fromarray(np.uint8(bcartes), 'L')
-    
+        # rfinal = Image.fromarray(np.uint8(rpolar), 'L')
+        # gfinal = Image.fromarray(np.uint8(gpolar), 'L')
+        # bfinal = Image.fromarray(np.uint8(bpolar), 'L')
+
     # enlarge the green and blue channels slightly, blue being the most enlarged
     gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]),
                             round((1 + 0.018 * strength) * rdata.shape[0])), Image.ANTIALIAS)
@@ -242,15 +265,16 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
     rwdiff = (bwidth - rwidth) // 2
     ghdiff = (bheight - gheight) // 2
     gwdiff = (bwidth - gwidth) // 2
-    
+
     # Centre the channels
     im = Image.merge("RGB", (
         rfinal.crop((-rwdiff, -rhdiff, bwidth - rwdiff, bheight - rhdiff)),
         gfinal.crop((-gwdiff, -ghdiff, bwidth - gwdiff, bheight - ghdiff)),
         bfinal))
-    
+
     # Crop the image to the original image dimensions
     return im.crop((rwdiff, rhdiff, rwidth + rwdiff, rheight + rhdiff))
+
 
 def add_jitter(im, pixels: int = 1):
     """Adds a small pixel offset to the Red and Blue channels of <im>,
@@ -270,6 +294,7 @@ def add_jitter(im, pixels: int = 1):
         b.crop((-pixels, 0, bwidth - pixels, bheight))))
     return im
 
+
 def blend_images(im, og_im, alpha: float = 1, strength: float = 1):
     """Blends original image <og_im> as an overlay over <im>, with
     an alpha value of <alpha>. Resizes <og_im> with respect to <strength>,
@@ -278,7 +303,7 @@ def blend_images(im, og_im, alpha: float = 1, strength: float = 1):
     og_im.putalpha(int(255 * alpha))
     og_im = og_im.resize((round((1 + 0.018 * strength) * og_im.size[0]),
                           round((1 + 0.018 * strength) * og_im.size[1])), Image.ANTIALIAS)
-    
+
     hdiff = (og_im.size[1] - im.size[1]) // 2
     wdiff = (og_im.size[0] - im.size[0]) // 2
     og_im = og_im.crop((wdiff, hdiff, wdiff + im.size[0], hdiff + im.size[1]))
@@ -290,8 +315,10 @@ def blend_images(im, og_im, alpha: float = 1, strength: float = 1):
     final_im = final_im.convert('RGB')
     return final_im
 
+
 if __name__ == '__main__':
     import argparse
+
     parser = argparse.ArgumentParser(
         description="Apply chromatic aberration and lens blur to images")
     parser.add_argument("filename", help="input filename")
@@ -314,7 +341,7 @@ if __name__ == '__main__':
     im = Image.open(ifile)
     if (args.verbose):
         print("Original Image:", im.format, im.size, im.mode)
-    
+
     if (im.mode != 'RGB'):
         if (args.verbose):
             print("Converting to RGB...")
@@ -338,9 +365,9 @@ if __name__ == '__main__':
     im = add_chromatic(im, strength=args.strength, no_blur=args.noblur)
 
     # Add Jitter Effect
-    im = add_jitter(im, pixels = args.jitter)
+    im = add_jitter(im, pixels=args.jitter)
 
-    im = blend_images(im, og_im, alpha = args.overlay, strength=args.strength)
+    im = blend_images(im, og_im, alpha=args.overlay, strength=args.strength)
 
     # Save Final Image
     if args.out == None:
