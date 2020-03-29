@@ -106,25 +106,13 @@ def polar_to_cartesian(data: np.ndarray, width: int, height: int) -> np.ndarray:
     div0()
 
     # Same code as above, except the order of the assignments are switched
+    # Code blocks are split up for easier profiling
     def part1():
-        # slope = np.arange(halfh - 1, -1, -1) / halfw
-        # diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
-        # unit_xstep = diagx / (halfdiag - 1)
-        # unit_ystep = diagx * slope / (halfdiag - 1)
-        # row = np.arange(0, halfdiag)
-        # ystep = np.round(row * unit_ystep)
-        # xstep = np.round(row * unit_xstep)
-
         for i in range(0, halfh):
             slope = (halfh - i) / (halfw)
             diagx = ((halfdiag ** 2) / (slope ** 2 + 1)) ** 0.5
             unit_xstep = diagx / (halfdiag - 1)
             unit_ystep = diagx * slope / (halfdiag - 1)
-            # ystep = np.round(np.arange(0, halfh, unit_ystep)).astype(int)
-            # xstep = np.round(np.arange(0, halfw, unit_xstep)).astype(int)
-            # length = min(ystep[-1], xstep[-1], halfdiag)
-            # xstep = xstep[:length]
-            # ret[halfh - ystep, halfw - xstep] = data[row, i]
             for row in range(halfdiag):
                 ystep = round(row * unit_ystep)
                 xstep = round(row * unit_xstep)
@@ -248,9 +236,6 @@ def add_chromatic(im, strength: float = 1, no_blur: bool = False):
         rfinal = Image.fromarray(np.uint8(rcartes), 'L')
         gfinal = Image.fromarray(np.uint8(gcartes), 'L')
         bfinal = Image.fromarray(np.uint8(bcartes), 'L')
-        # rfinal = Image.fromarray(np.uint8(rpolar), 'L')
-        # gfinal = Image.fromarray(np.uint8(gpolar), 'L')
-        # bfinal = Image.fromarray(np.uint8(bpolar), 'L')
 
     # enlarge the green and blue channels slightly, blue being the most enlarged
     gfinal = gfinal.resize((round((1 + 0.018 * strength) * rdata.shape[1]),
