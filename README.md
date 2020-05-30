@@ -18,7 +18,7 @@ $ python3 kromo.py -v flower.jpg
 Original Image: JPEG (1962, 2615) RGB
 Dimensions must be odd numbers, cropping...
 New Dimensions: (1961, 2615)
-Completed in:  80.14s
+Completed in:  43.85s
 
 ```
 
